@@ -7,7 +7,7 @@ began in 1845 (the twenty-second anniversary of the Mexican Revolution), and
 is the 1st example of a national independence holiday becoming popular in the
 Western Hemisphere. (The Fourth of July didn't see regular celebration in the
 US until 15-20 years later.) It is celebrated by 77.9% of the population--
-trending toward 80.                                                                
+trending toward 80.
 '''
 
 class TestCase(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestCase(unittest.TestCase):
     # Helper function
     def assert_extract(self, text, extractors, *expected):
         actual = [x[1].group(0) for x in library.scan(text, extractors)]
-        self.assertEquals(str(actual), str([x for x in expected]))
+        self.assertEqual(str(actual), str([x for x in expected]))
 
     # First unit test; prove that if we scan NUM_CORPUS looking for mixed_ordinals,
     # we find "5th" and "1st".
