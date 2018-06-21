@@ -30,9 +30,17 @@ class TestCase(unittest.TestCase):
     def test_no_integers(self):
         self.assert_extract("no integers", library.integers)
 
-    # 4th unit test; prove that if we look for iso8601 dates we find some of them
-    def test_iso8601_dates(self):
+    # 4. Prove that if we look for iso8601 dates we find some of them
+    def test_dates_iso8601(self):
         self.assert_extract('I was born on 2015-07-25.', library.dates_iso8601, '2015-07-25')
+
+    # 5. Prove that we don't match dates with impossible day
+    def test_dates_iso8601_dont_match_too_big_day(self):
+        self.assert_extract('There is no such date as 2015-07-32.', library.dates_iso8601)
+
+    # 6. Prove that we don't match dates with impossible month
+    def test_dates_iso8601_dont_match_too_big_month(self):
+        self.assert_extract('There is no such date as 2015-13-25.', library.dates_iso8601)
 
 
 if __name__ == '__main__':
