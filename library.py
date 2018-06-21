@@ -3,6 +3,7 @@ import re
 _whole_word = lambda x: re.compile(r'(?<=\W)' + x + '(?=\W)')
 _mixed_ordinal_pat = _whole_word(r'-?\d+(st|th|nd|rd)')
 _integer_pat = _whole_word(r'\d+')
+_date_iso8601_pat = _whole_word(r'\d{4}-\d{2}-\d{2}')
 _floating_point_after_pat = re.compile(r'\.\d+[^a-zA-Z.]')
 _floating_point_before_pat = re.compile(r'(?<=\d\.)')
 
@@ -19,6 +20,10 @@ def integers(text):
                 _floating_point_after_pat.match(text, match.end()):
             continue
         yield ('integer', match)
+
+def dates_iso8601(text):
+    for match in _date_iso8601_pat.finditer(text):
+        yield('date', match)
 
 def scan(text, *extractors):
     '''
