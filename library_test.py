@@ -42,6 +42,9 @@ class TestCase(unittest.TestCase):
     def test_dates_iso8601_dont_match_too_big_month(self):
         self.assert_extract('There is no such date as 2015-13-25.', library.dates_iso8601)
 
+    # 7. Prove that if we look for dates in fmt2 we find some of them
+    def test_dates_fmt2(self):
+        self.assert_extract('I was born on 25 Jan 2017.', library.dates_fmt2, '25 Jan 2017')
 
 if __name__ == '__main__':
     unittest.main()
