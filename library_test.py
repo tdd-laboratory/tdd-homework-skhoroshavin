@@ -13,8 +13,11 @@ trending toward 80.
 class TestCase(unittest.TestCase):
 
     # Helper function
+    def extract_data(self, text, extractors):
+        return [x[1].group(0) for x in library.scan(text, extractors)]
+
     def assert_extract(self, text, extractors, *expected):
-        actual = [x[1].group(0) for x in library.scan(text, extractors)]
+        actual = self.extract_data(text, extractors)
         self.assertEqual(str(actual), str([x for x in expected]))
 
     # First unit test; prove that if we scan NUM_CORPUS looking for mixed_ordinals,
@@ -120,6 +123,61 @@ class TestCase(unittest.TestCase):
 
     def test_dates_iso8601_match_date_in_the_end_of_string(self):
         self.assert_extract('I was born on 2016-02-29', library.dates_iso8601, '2015-02-29')
+
+    # Bonus! In fact I'm a big fan of yet another approach to tests, which is called property based testing.
+    # I've mentioned that a couple of times, but now I see a chance to give a hint at it's power.
+    # Main idea is to just come up with some properties (and there are already some patterns exist to help find
+    # such properties), possibly write generator function to create valid examples and then throw hundreds
+    # of examples at test. There are multiple frameworks for doing this in different languages, an excellent
+    # example of such framework for Python is Hypothesis. It already has many generators, as well as many
+    # ways to combine these generators into more complex ones. Also when it finds failing case it performs
+    # so called "shrinking", which means trying to generate minimal possible example that still fails, which
+    # greatly helps in understanding what's wrong. I won't import hypothesis here, you can just
+    # Google "Python Hypothesis", there are plenty examples on the internet of how tests look. What I'm going
+    # to show there is some crude examples of properties that can greatly reduce amount of tests written.
+
+    # Here we rely on generator that can generate any string. In fact to increase probability
+    # of edge cases it would be much better to use some custom written generator that definitely
+    # includes valid dates as well as just parts of valid dates. Writing such generator is
+    # certainly a time investment, but often it pays off very quick. This is an example of
+    # "hard to find easy to verify" property pattern
+    def property_all_dates_found_should_be_in_original_string(self, any_string):
+        actual = self.extract_data(any_string, library.dates_iso8601)
+        assert all(date in any_string for date in actual)
+
+    # Relying on another generator, which can share a lot of code with previous one.
+    # While one could argue that writing generators can introduce more errors, but
+    # as with traditional unit tests bugs in tests are actually captured by production
+    # code. And vice verse, of course. Also, writing generator is much more simple
+    # task than writing a detector (or even parser).
+    def property_valid_dates_should_be_detected(self, string_representing_valid_date):
+        actual = self.extract_data(string_representing_valid_date, library.dates_iso8601)
+        assert len(actual) == 1
+        assert actual[0] == string_representing_valid_date
+
+    def property_valid_dates_should_be_found_in_haystack(self, string_containing_valid_dates):
+        actual = self.extract_data(any_string, library.dates_iso8601)
+        assert len(actual) > 0
+
+    def property_no_false_positives_should_be_given(self, string_containing_no_valid_date):
+        actual = self.extract_data(any_string, library.dates_iso8601)
+        assert len(actual) == 0
+
+    # Another common pattern is idempotence. If we modify our extractor function so that it
+    # returns string with separators definitely not in dates, then...
+    def property_check_extractor_idempotence(self, any_string):
+        def extract_helper(source):
+            return " | ".join(self.extract_data(source, library.dates_iso8601))
+        assert extract_helper(any_string) == extract_helper(extract_helper(any_string))
+
+    # There are many more patterns for properties, like "different paths, same result",
+    # "there and back again", "test oracle", "stateful testing" etc. Not all of them are applicable
+    # in this small example. Also, in my opinion property based testing doesn't make ordinary
+    # "example based testing" obsolete, as examples are very easy for humans to understand and
+    # give good starting point. But for finding corner cases I strongly believe property based
+    # testing is a way to go. By the way, it's not a new concept, it was first introduced in Haskell
+    # by a QuickCheck library, and when in doubt if there is a such framework for your favorite language
+    # one can just Google for "quickcheck for <lang>". Hopefully someone will read this...
 
 
 if __name__ == '__main__':
