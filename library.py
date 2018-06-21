@@ -3,7 +3,7 @@ import re
 _whole_word = lambda x: re.compile(r'(?<=\W)' + x + '(?=\W)')
 _mixed_ordinal_pat = _whole_word(r'-?\d+(st|th|nd|rd)')
 _integer_pat = _whole_word(r'\d+')
-_date_iso8601_pat = _whole_word(r'\d{4}-\d{2}-\d{2}')
+_date_iso8601_pat = _whole_word(r'\d{4}-(0\d|1[0-2])-(0[1-9]|[12][0-9]|3[01])')
 _floating_point_after_pat = re.compile(r'\.\d+[^a-zA-Z.]')
 _floating_point_before_pat = re.compile(r'(?<=\d\.)')
 
