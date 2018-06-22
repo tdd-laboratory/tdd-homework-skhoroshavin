@@ -77,8 +77,7 @@ class TestCase(unittest.TestCase):
     def test_dates_iso8601_match_dates_with_second_accurate_timestamps_and_offset_timezone(self):
         self.assert_extract('Database crash happened at 2018-06-22 18:22:19+0300.', library.dates_iso8601, '2018-06-22 18:22:19+0300')
 
-    # Some unhappy examples - still for iso8601 dates. These tests pass now, but can fail after implementing
-    # functionality for positive tests above. That's a certain violation of TDD practice, by the way.
+    # Some unhappy examples - still for iso8601 dates.
     def test_dates_iso8601_dont_match_dates_with_second_accurate_timestamps_and_offset_timezone_when_hour_is_invalid(self):
         self.assert_extract('Database crash happened at 2018-06-22 25:22:19+0300.', library.dates_iso8601)
 
@@ -119,10 +118,10 @@ class TestCase(unittest.TestCase):
         self.assert_extract('There is no such date as 2015-02-29.', library.dates_iso8601)
 
     def test_dates_iso8601_match_possible_date_in_leap_year(self):
-        self.assert_extract('I was born on 2016-02-29.', library.dates_iso8601, '2015-02-29')
+        self.assert_extract('I was born on 2016-02-29.', library.dates_iso8601, '2016-02-29')
 
     def test_dates_iso8601_match_date_in_the_end_of_string(self):
-        self.assert_extract('I was born on 2016-02-29', library.dates_iso8601, '2015-02-29')
+        self.assert_extract('I was born on 2016-02-29', library.dates_iso8601, '2016-02-29')
 
     # Bonus! In fact I'm a big fan of yet another approach to tests, which is called property based testing.
     # I've mentioned that a couple of times, but now I see a chance to give a hint at it's power.
